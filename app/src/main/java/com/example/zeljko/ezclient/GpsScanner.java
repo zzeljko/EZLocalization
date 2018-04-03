@@ -22,10 +22,10 @@ class GpsScanner {
     private LocationListener locationListener;
     private Context context;
 
-    GpsScanner(Context context) {
+    GpsScanner(Context context, IGpsDataCallback gpsDataCallback) {
 
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new GpsLocationListener(context);
+        locationListener = new GpsLocationListener(context, gpsDataCallback);
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context,
@@ -35,19 +35,11 @@ class GpsScanner {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BETWEEN_SCANS,
                 MIN_DISTANCE_BETWEEN_SCANS, locationListener);
 
-        if (locationListener == null)
-            Log.d("interior", "interior");
-        else
-            Log.d("ext", "ext");
-
         this.context = context;
     }
 
-    public Location getGpsCoord() {
-        return ((GpsLocationListener) locationListener).getGpsCoord();
+    public void remove() {
+        locationManager.removeUpdates(locationListener);
     }
 
-    public boolean checkGpsAvail() {
-        return ((GpsLocationListener) locationListener).checkGpsAvailable();
-    }
 }

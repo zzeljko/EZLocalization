@@ -15,21 +15,24 @@ class GpsLocationListener implements android.location.LocationListener {
     Context context;
     boolean gpsAvailable;
     Location location;
+    IGpsDataCallback gpsDataCallback;
 
-    GpsLocationListener(Context context) {
+    GpsLocationListener(Context context, IGpsDataCallback gpsDataCallback) {
         this.context = context;
         gpsAvailable = false;
+        this.gpsDataCallback = gpsDataCallback;
     }
 
     @Override
     public void onLocationChanged(Location location) {
         this.location = location;
-        Toast.makeText(context, "got location", Toast.LENGTH_LONG).show();
+        gpsDataCallback.onGpsLocationChanged(location);
     }
 
     @Override
     public void onStatusChanged(String s, int status, Bundle bundle) {
         gpsAvailable = (status == LocationProvider.AVAILABLE);
+        gpsDataCallback.onGpsAvailabilityChange(gpsAvailable);
     }
 
     @Override
@@ -42,11 +45,4 @@ class GpsLocationListener implements android.location.LocationListener {
 
     }
 
-    public boolean checkGpsAvailable() {
-        return gpsAvailable;
-    }
-
-    public Location getGpsCoord() {
-        return location;
-    }
 }

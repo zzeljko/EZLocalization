@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IGpsDataCallback {
 
     private GpsScanner gpsScanner;
     private WiFiScanner wiFiScanner;
@@ -18,29 +18,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        gpsScanner = new GpsScanner(this);
+        gpsScanner = new GpsScanner(this, this);
         wiFiScanner = new WiFiScanner();
         channel = new CommunicationChannel();
-
-        startEz();
     }
 
-    private void startEz() {
-
-        if(gpsScanner.checkGpsAvail()) {
-            Location coord = gpsScanner.getGpsCoord();
-            Toast.makeText(this, coord + "", Toast.LENGTH_SHORT).show();
-            List<AccesPoint> wiFiUnknownAPList = wiFiScanner.getUnknownAccessPointList();
-
-            channel.sendToEzServer(new ServerMessage(coord, wiFiUnknownAPList));
-            startEz();
-        }
-
-        List<AccesPoint> wiFiAPList = wiFiScanner.getVisibleAccessPointList();
-        channel.sendToEzServer(new ServerMessage(wiFiAPList));
-        Toast.makeText(this, "gps not avail", Toast.LENGTH_SHORT).show();
-
-        startEz();
+    @Override
+    protected  void onDestroy() {
+        super.onDestroy();
+        gpsScanner.remove();
     }
 
+    @Override
+    public void onGpsAvailabilityChange(boolean avail) {
+        if (!avail)
+            Toast.makeText(this, "GPS not avail", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onGpsLocationChanged(Location location) {
+        Toast.makeText(this, location.toString(), Toast.LENGTH_SHORT).show();
+    }
 }
