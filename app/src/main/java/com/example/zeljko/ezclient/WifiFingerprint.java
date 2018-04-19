@@ -38,4 +38,24 @@ public class WifiFingerprint {
 
         this.timestamp = System.currentTimeMillis();
     }
+
+    public String toString() {
+        StringBuffer message = new StringBuffer();
+        message.append("<wifi t=\"");
+        message.append(timestamp);
+        message.append("\">\n");
+
+        for (WifiRecord record : recordList) {
+            message.append("<record bssId=\"");
+            message.append(record.bssId);
+            message.append("\" signal=\"");
+            message.append(record.signal);
+            message.append("\" channel=\"");
+            message.append(record.channel);
+            message.append("\" />\n");
+        }
+        message.append("</wifi>");
+
+        return message.toString();
+    }
 }

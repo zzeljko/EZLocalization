@@ -12,6 +12,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CommunicationChannel channel;
     private BroadcastReceiver gpsBroadcastReceiver;
+    private BroadcastReceiver wifiBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
         channel = new CommunicationChannel();
 
-        Intent intent = new Intent(getApplicationContext(), GpsScannerService.class);
+        Intent intent = new Intent(getApplicationContext(), ScannerService.class);
         startService(intent);
     }
 
@@ -36,17 +37,29 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
 
+        if (wifiBroadcastReceiver == null)
+            wifiBroadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Toast.makeText(getApplicationContext(), intent.getExtras().get("wifi_record_list").toString(), Toast.LENGTH_SHORT).show();
+                }
+            };
+
         registerReceiver(gpsBroadcastReceiver, new IntentFilter("location_update"));
+        registerReceiver(wifiBroadcastReceiver, new IntentFilter("wifi_scan"));
     }
 
     @Override
     protected  void onDestroy() {
         super.onDestroy();
 
-        Intent intent = new Intent(getApplicationContext(), GpsScannerService.class);
+        Intent intent = new Intent(getApplicationContext(), ScannerService.class);
         stopService(intent);
 
         if (gpsBroadcastReceiver != null)
             unregisterReceiver(gpsBroadcastReceiver);
+
+        if (wifiBroadcastReceiver != null)
+            unregisterReceiver(wifiBroadcastReceiver);
     }
 }

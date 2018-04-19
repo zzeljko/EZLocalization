@@ -14,13 +14,12 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by zeljko on 21.03.2018.
  */
 
-public class GpsScannerService extends Service implements IOnWifiDataCallback {
+public class ScannerService extends Service implements IOnWifiDataCallback {
 
     private static final int MIN_TIME_BETWEEN_SCANS = 1000;
     private static final int MIN_DISTANCE_BETWEEN_SCANS = 0;
@@ -95,6 +94,10 @@ public class GpsScannerService extends Service implements IOnWifiDataCallback {
 
     @Override
     public void onWiFiSample(WifiFingerprint scan) {
-        Toast.makeText(getApplicationContext(), scan.toString(), Toast.LENGTH_SHORT).show();
+        Log.d("callback", scan.toString());
+        Intent intent = new Intent("wifi_scan");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("wifi_record_list", scan.toString());
+        sendBroadcast(intent);
     }
 }
