@@ -14,18 +14,20 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by zeljko on 21.03.2018.
  */
 
-public class GpsScannerService extends Service {
+public class GpsScannerService extends Service implements IOnWifiDataCallback {
 
     private static final int MIN_TIME_BETWEEN_SCANS = 1000;
     private static final int MIN_DISTANCE_BETWEEN_SCANS = 0;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private WifiScanner wifiScanner;
 
     @Nullable
     @Override
@@ -46,6 +48,9 @@ public class GpsScannerService extends Service {
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BETWEEN_SCANS,
                 MIN_DISTANCE_BETWEEN_SCANS, locationListener);
+
+
+        wifiScanner = new WifiScanner(getApplicationContext(), this);
     }
 
     private void createLocationListener() {
@@ -84,5 +89,12 @@ public class GpsScannerService extends Service {
         super.onDestroy();
         if (locationManager != null)
             locationManager.removeUpdates(locationListener);
+        if (wifiScanner != null)
+            wifiScanner.stopScanning();
+    }
+
+    @Override
+    public void onWiFiSample(WifiFingerprint scan) {
+        Toast.makeText(getApplicationContext(), scan.toString(), Toast.LENGTH_SHORT).show();
     }
 }

@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private WifiScanner wiFiScanner;
     private CommunicationChannel channel;
     private BroadcastReceiver gpsBroadcastReceiver;
 
@@ -19,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        wiFiScanner = new WifiScanner();
         channel = new CommunicationChannel();
 
         Intent intent = new Intent(getApplicationContext(), GpsScannerService.class);

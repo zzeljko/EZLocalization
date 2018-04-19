@@ -16,11 +16,11 @@ import java.util.List;
 
 class WifiScanner extends BroadcastReceiver {
 
-    private IOnWiFiDataCallback wiFiDataCallback;
+    private IOnWifiDataCallback wiFiDataCallback;
     private WifiManager wifiManager;
     private Context context;
 
-    public WifiScanner(Context context, IOnWiFiDataCallback wiFiDataCallback) {
+    public WifiScanner(Context context, IOnWifiDataCallback wiFiDataCallback) {
         super();
 
         this.context = context;
@@ -43,7 +43,13 @@ class WifiScanner extends BroadcastReceiver {
 
         List<ScanResult> wifiScanResults = wifiManager.getScanResults();
 
-        WifiFingerprint wiFiFingerprint = new WifiFingerprint(wifiScanResults);
+        WifiFingerprint wifiFingerprint = new WifiFingerprint(wifiScanResults);
+        wiFiDataCallback.onWiFiSample(wifiFingerprint);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         wifiManager.startScan();
     }
 
