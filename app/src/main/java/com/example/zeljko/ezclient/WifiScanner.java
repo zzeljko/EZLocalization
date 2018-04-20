@@ -47,7 +47,7 @@ class WifiScanner extends BroadcastReceiver {
         WifiFingerprint wifiFingerprint = new WifiFingerprint(wifiScanResults);
         wiFiDataCallback.onWiFiSample(wifiFingerprint);
         try {
-            Thread.sleep(10000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

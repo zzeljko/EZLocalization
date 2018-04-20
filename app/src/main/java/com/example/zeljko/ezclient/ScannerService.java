@@ -48,7 +48,6 @@ public class ScannerService extends Service implements IOnWifiDataCallback {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BETWEEN_SCANS,
                 MIN_DISTANCE_BETWEEN_SCANS, locationListener);
 
-
         wifiScanner = new WifiScanner(getApplicationContext(), this);
     }
 
