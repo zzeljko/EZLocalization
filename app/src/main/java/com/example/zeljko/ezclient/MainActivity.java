@@ -31,7 +31,10 @@ public class MainActivity extends AppCompatActivity {
             gpsBroadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    Toast.makeText(getApplicationContext(), intent.getExtras().get("location").toString(), Toast.LENGTH_SHORT).show();
+
+                    String message = intent.getExtras().get("location").toString();
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                    new MessageSender().execute(message);
                 }
             };
 
@@ -39,7 +42,11 @@ public class MainActivity extends AppCompatActivity {
             wifiBroadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    Toast.makeText(getApplicationContext(), intent.getExtras().get("wifi_record_list").toString(), Toast.LENGTH_SHORT).show();
+
+                    String message = intent.getExtras().get("wifi_record_list").toString();
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                    new MessageSender().execute(message);
+
                 }
             };
 
