@@ -1,0 +1,102 @@
+{
+	"wifi_records": 
+		[
+			{
+				"bssId": "28:a6:db:e4:bf:fc",
+				"signal": "-71",
+				"channel": "11"
+			},
+
+			{
+				"bssId": "04:b0:e7:3f:a4:bc",
+				"signal": "-75",
+				"channel": "11"
+			},
+
+			{
+				"bssId": "0c:41:e9:89:17:b4",
+				"signal": "-78",
+				"channel": "2"
+			},
+
+			{
+				"bssId": "a4:99:47:d5:11:b6",
+				"signal": "-81",
+				"channel": "8"
+			},
+
+			{
+				"bssId": "88:44:77:d9:28:08",
+				"signal": "-80",
+				"channel": "11"
+			},
+
+			{
+				"bssId": "c4:ff:1f:10:e3:88",
+				"signal": "-72",
+				"channel": "9"
+			},
+
+			{
+				"bssId": "c4:ff:1f:cc:4b:ec",
+				"signal": "-78",
+				"channel": "6"
+			},
+
+			{
+				"bssId": "f4:f2:6d:a7:f6:a6",
+				"signal": "-81",
+				"channel": "5"
+			},
+
+			{
+				"bssId": "ec:23:3d:9c:7d:53",
+				"signal": "-82",
+				"channel": "5"
+			},
+
+			{
+				"bssId": "88:44:77:d9:28:0b",
+				"signal": "-80",
+				"channel": "11"
+			},
+
+			{
+				"bssId": "48:f8:b3:7d:ff:77",
+				"signal": "-76",
+				"channel": "3"
+			},
+
+			{
+				"bssId": "28:a6:db:e4:bd:f4",
+				"signal": "-78",
+				"channel": "1"
+			},
+
+			{
+				"bssId": "30:b5:c2:80:1f:dd",
+				"signal": "-80",
+				"channel": "1"
+			},
+
+			{
+				"bssId": "72:96:a0:cc:45:40",
+				"signal": "-86",
+				"channel": "10"
+			},
+
+			{
+				"bssId": "88:53:d4:6a:cd:6d",
+				"signal": "-80",
+				"channel": "3"
+			},
+
+			{
+				"bssId": "f4:f2:6d:a8:cb:b6",
+				"signal": "-84",
+				"channel": "13"
+			},
+
+			{
+				"bssId": "72:96:a0:cc:45:41",
+

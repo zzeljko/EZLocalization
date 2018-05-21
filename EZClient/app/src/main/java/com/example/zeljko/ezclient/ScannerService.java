@@ -57,7 +57,7 @@ public class ScannerService extends Service implements IOnWifiDataCallback {
             @Override
             public void onLocationChanged(Location location) {
                 Intent intent = new Intent("location_update");
-                intent.putExtra("location", location.getLatitude() + " " + location.getLongitude());
+                intent.putExtra("location", new GPSFingerprint(location).toString());
 
                 sendBroadcast(intent);
             }
@@ -93,7 +93,6 @@ public class ScannerService extends Service implements IOnWifiDataCallback {
 
     @Override
     public void onWiFiSample(WifiFingerprint scan) {
-        Log.d("callback", scan.toString());
         Intent intent = new Intent("wifi_scan");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("wifi_record_list", scan.toString());

@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
                     String message = intent.getExtras().get("location").toString();
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                    new MessageSender().execute(message);
+                    new MessageSender().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message, getString(R.string.gps_message_to_server));
                 }
             };
 
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
                     String message = intent.getExtras().get("wifi_record_list").toString();
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                    new MessageSender().execute(message);
+                    new MessageSender().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message, getString(R.string.wifi_message_to_server));
 
                 }
             };

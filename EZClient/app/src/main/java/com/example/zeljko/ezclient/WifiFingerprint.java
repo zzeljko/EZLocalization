@@ -39,20 +39,6 @@ public class WifiFingerprint {
         this.timestamp = System.currentTimeMillis();
     }
 
-    /*
-    {
-        "wifi_records":
-            [
-                {
-                    "bssId":
-                    "signal":
-                    "channel":
-                },
-            ]
-        "timestamp":
-
-    }
-     */
     public String toString() {
         StringBuffer message = new StringBuffer();
 

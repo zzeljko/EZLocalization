@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">EZClient</string>
+    <string name="gps_message_to_server">GPS</string>
+    <string name="wifi_message_to_server">WIFI</string>
 </resources>
