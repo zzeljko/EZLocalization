@@ -28,7 +28,7 @@ class GPSFingerprint {
 
         message.append("\t\t\t\t\"la\": \"" + location.getLatitude() + "\",\n");
         message.append("\t\t\t\t\"lo\": \"" + location.getLongitude() + "\",\n");
-        message.append("\t\t\t\t\"t\": \"" + location.getLongitude() + "\"\n");
+        message.append("\t\t\t\t\"t\": \"" + timestamp + "\"\n");
         message.append("\t\t}");
 
         message.append("\n}");
