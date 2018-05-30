@@ -42,20 +42,20 @@ public class WifiFingerprint {
     public String toString() {
         StringBuffer message = new StringBuffer();
 
-        message.append("{\n\t\"wifi_records\": \n\t\t[");
+        message.append("{\n\t\"wr\": \n\t\t[");
         message.append("\n");
 
         for (WifiRecord record : recordList) {
             message.append("\t\t\t{\n");
-            message.append("\t\t\t\t\"bssId\": \"" + record.bssId + "\",\n");
-            message.append("\t\t\t\t\"signal\": \"" + record.signal + "\",\n");
-            message.append("\t\t\t\t\"channel\": \"" + record.channel + "\"\n");
+            message.append("\t\t\t\t\"b\": \"" + record.bssId + "\",\n");
+            message.append("\t\t\t\t\"s\": \"" + record.signal + "\",\n");
+            message.append("\t\t\t\t\"c\": \"" + record.channel + "\"\n");
             message.append("\t\t\t},\n\n");
         }
         message.deleteCharAt(message.lastIndexOf(","));
 
         message.append("\t\t],\n");
-        message.append("\t\"timestamp\": \"" + timestamp + "\"");
+        message.append("\t\"t\": \"" + timestamp + "\"");
         message.append("\n}");
         return message.toString();
     }

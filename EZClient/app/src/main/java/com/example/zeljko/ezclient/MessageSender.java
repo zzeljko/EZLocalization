@@ -17,12 +17,15 @@ import java.net.Socket;
 public class MessageSender extends AsyncTask<String,Void,String> {
 
     private static final String host = "192.168.100.15";
+    private static boolean transmissionFinished = true;
 
     @Override
     protected String doInBackground(String... params) {
 
         String message = params[0];
         String messageType = params[1];
+        while (!transmissionFinished);
+        transmissionFinished = false;
         try {
             Socket mySocket = new Socket(host,8888);
 
@@ -49,5 +52,10 @@ public class MessageSender extends AsyncTask<String,Void,String> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        transmissionFinished = true;
     }
 }
