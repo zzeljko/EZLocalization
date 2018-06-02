@@ -5,10 +5,9 @@ class WifiAP():
 		self.jsonDict = json_dict
 		self.bssId = self.jsonDict["b"]
 		self.signal = self.jsonDict["s"]
-		self.channel = self.jsonDict["c"]
 
 	def __str__(self):
-		return "AP MAC: " + self.bssId + '\n' + "Signal Strength: " + self.signal + '\n' + "Channel: " + self.channel  
+		return "AP MAC: " + self.bssId + '\n' + "Signal Strength: " + self.signal  
 
 class WifiScan():
 	def __init__(self, client, json_dict):

@@ -14,7 +14,7 @@ def create_table():
 	
 	conn = sqlite3.connect('samples.db')
 	c = conn.cursor()
-	c.execute("CREATE TABLE IF NOT EXISTS wifi_samples (bssId varchar(25), signalStrength integer, channel integer, timestamp bigint)")
+	c.execute("CREATE TABLE IF NOT EXISTS wifi_samples (bssId varchar(25), signalStrength integer, timestamp bigint)")
 	c.execute("CREATE TABLE IF NOT EXISTS gps_samples (client varchar(25), latitude double precision, longitude double precision, timestamp bigint)")
 	return conn
 
@@ -23,7 +23,7 @@ def add_to_db(scanType, scan, conn):
 
 	if scanType == wifiFingerprint:
 		for ap in scan.wifiAPList:
-			c.execute("insert into wifi_samples values (?, ?, ?, ?)", [ap.bssId, ap.signal, ap.channel, scan.timestamp])
+			c.execute("insert into wifi_samples values (?, ?, ?)", [ap.bssId, ap.signal, scan.timestamp])
 			conn.commit()
 	else:
 		c.execute("insert into gps_samples values (?, ?, ?, ?)", [scan.client, scan.latitude, scan.longitude, scan.timestamp])

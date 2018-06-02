@@ -11,32 +11,31 @@ import java.util.List;
 
 public class WifiFingerprint {
 
-    public class WifiRecord {
-
-        String bssId;
-        int signal;
-        int channel;
-
-        public WifiRecord(String bssId, int signal, int channel) {
-            this.bssId = bssId;
-            this.signal = signal;
-            this.channel = channel;
-        }
-    }
-
     private List<WifiRecord> recordList;
     private long timestamp;
 
     public WifiFingerprint(List<ScanResult> wifiScanResults) {
-        recordList = new ArrayList<WifiRecord>();
+        recordList = new ArrayList<>();
 
         for (ScanResult result : wifiScanResults) {
             recordList.add(new WifiRecord(result.BSSID,
-                    result.level,
-                    WifiChannel.getChannel(result.frequency)));
+                    result.level));
         }
 
         this.timestamp = System.currentTimeMillis();
+    }
+
+    public WifiFingerprint(List<WifiRecord> wifiRecords, long timestamp) {
+
+        recordList = new ArrayList<>();
+        for (WifiRecord wr : wifiRecords)
+            recordList.add(wr);
+
+        this.timestamp = timestamp;
+    }
+
+    public List<WifiRecord> getRecordList() {
+        return recordList;
     }
 
     public String toString() {
@@ -48,8 +47,7 @@ public class WifiFingerprint {
         for (WifiRecord record : recordList) {
             message.append("\t\t\t{\n");
             message.append("\t\t\t\t\"b\": \"" + record.bssId + "\",\n");
-            message.append("\t\t\t\t\"s\": \"" + record.signal + "\",\n");
-            message.append("\t\t\t\t\"c\": \"" + record.channel + "\"\n");
+            message.append("\t\t\t\t\"s\": \"" + record.signal + "\"\n");
             message.append("\t\t\t},\n\n");
         }
         message.deleteCharAt(message.lastIndexOf(","));
