@@ -64,19 +64,28 @@ def compute_JEZ(observationList):
 
 def generate_new_solution(observationList):
 
+	newObservationList = []
 	for observation in observationList:
 		if not observation.gps_granted:
 			observation.latitude = random.uniform(MIN_LATITTUDE, MAX_LATITUDE) 
 			observation.longitude = random.uniform(MIN_LONGITUDE, MAX_LONGITUDE)
 
+		apList = []
 		for ap in observation.access_points:
 			ap.path_loss = random.uniform(MIN_PATH_LOSS, MAX_PATH_LOSS)
 			ap.pi0 = random.randint(MIN_PI0, MAX_PI0 + 1)
 			ap.latitude = random.uniform(MIN_LATITTUDE, MAX_LATITUDE) 
 			ap.longitude = random.uniform(MIN_LONGITUDE, MAX_LONGITUDE)
 
-	JEZ = compute_JEZ(observationList)
-	return Solution(JEZ, observationList)
+			apList.append(AccessPoint(ap.name, ap.apPij, ap.path_loss, ap.pi0, ap.latitude, ap.longitude))
+		
+		newObservationList.append(DeviceObservation(observation.timestamp, observation.latitude, 
+			observation.longitude, observation.gps_granted, apList))
+	
+	JEZ = compute_JEZ(newObservationList)
+
+	return Solution(JEZ, newObservationList)
+
 
 conn = sqlite3.connect('samples.db')
 c = conn.cursor()
@@ -133,16 +142,22 @@ for row in rows:
 			observationList.append(DeviceObservation(timestamp, latitude, longitude, False, 
 				[AccessPoint(apName, apPij, path_loss, pi0, ap_latitude, ap_longitude)]))
 
-# for observation in observationList:
-# 	for ap in observation.access_points:
-# 		print ap
-# 	print "====="
-
 JEZ = compute_JEZ(observationList)
 solutions = [Solution(JEZ, observationList)]
 
-for i in xrange(SOLUTIONS_PER_GENERATION):
-
+for i in xrange(SOLUTIONS_PER_GENERATION - 1):
 	solutions.append(generate_new_solution(observationList))
 
-print [solution.JEZ for solution in solutions]
+for i in xrange(10):
+	best = min([x.JEZ for x in solutions])
+	for x in solutions:
+		if x.JEZ == best:
+			observationList = x.observationList
+			solutions.remove(x)
+			break
+
+	print best
+	print len(solutions)
+	for observation in observationList:
+		print observation
+	print "\n"
