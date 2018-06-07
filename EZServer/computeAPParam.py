@@ -2,6 +2,7 @@ import sqlite3
 import random
 import math
 import numpy
+from grad import DeviceObservation, AccessPoint, Solution, gradient_descent, compute_JEZ
 
 MIN_PATH_LOSS = 2
 MAX_PATH_LOSS = 10
@@ -22,50 +23,6 @@ SOLUTIONS_PER_GENERATION = 100
 TEN_PERCENT = 10 / 100.0
 SIXTY_PERCENT = 60 / 100.0
 TWENTY_PERCENT = 20 / 100.0
-
-class Solution():
-
-	def __init__(self, JEZ, observationList):
-		self.JEZ = JEZ
-		self.observationList = observationList
-
-class AccessPoint():
-
-	def __init__(self, name, apPij, path_loss, Pi0, latitude, longitude):
-		self.name = name
-		self.path_loss = path_loss
-		self.Pi0 = Pi0
-		self.lat = latitude
-		self.long = longitude
-		self.apPij = apPij
-
-	def __str__(self):
-		return "\nMAC: " + str(self.name) + "\nPI0: " + str(self.Pi0) + "\nPathLoss: " + str(self.path_loss) + "\nLat: " + str(self.lat) + "\nLong: " + str(self.long) 
-
-class DeviceObservation():
-
-	def __init__(self, timestamp, latitude, longitude, gps_granted, access_points):
-		self.timestamp = timestamp
-		self.latitude = latitude
-		self.longitude = longitude
-		self.gps_granted = gps_granted
-		self.access_points = access_points
-
-	def __str__(self):
-		return "\nAt timestamp: " + str(self.timestamp) + "\nLat: " + str(self.latitude) + "\nLong: " + str(self.longitude)
-
-def compute_JEZ(observationList):
-	
-	s = 0
-	N = 0
-
-	for observation in observationList:
-		for ap in observation.access_points:
-			dij = math.sqrt((observation.latitude - ap.lat) ** 2 + (observation.longitude - ap.long) ** 2)
-			s = s + abs(ap.apPij - ap.Pi0 + 10 * ap.path_loss * math.log(dij, 2))
-			N = N + 1
-
-	return s / N * 1.0
 
 def generate_new_random_solution(observationList):
 
@@ -157,9 +114,15 @@ oldSolutions = [Solution(JEZ, observationList)]
 for i in xrange(SOLUTIONS_PER_GENERATION - 1):
 	oldSolutions.append(generate_new_random_solution(observationList))
 
+oldSolutions = gradient_descent(oldSolutions)
+for sol in oldSolutions:
+	print sol.JEZ
+
 count = 0
+oldSolutionToCompare = oldSolutions[1:int(TEN_PERCENT * SOLUTIONS_PER_GENERATION)]
 while True:
 	newSolutions = []
+	newSolutionToCompare = []
 	for i in xrange(int(TEN_PERCENT * SOLUTIONS_PER_GENERATION)):
 		best = min([x.JEZ for x in oldSolutions])
 
@@ -167,13 +130,30 @@ while True:
 			if x.JEZ == best:
 				oldObservationList = x.observationList[:]
 				oldSolutions.remove(x)
+				newSolutionToCompare.append(x)
 				break
 
 		newSolutions.append(Solution(best, oldObservationList))
 
+	solLen = len(newSolutions)
+	isBetter = False
+	for j in xrange(solLen):
+		if newSolutions[j].JEZ < oldSolutionToCompare[j].JEZ:
+			isBetter = True
+			break
+	if not isBetter:
+		count = count + 1
+		print count
+	else:
+		count = 0
+
+	if count == 10:
+		break
+
 	for i in xrange(int(TEN_PERCENT * SOLUTIONS_PER_GENERATION)):
 		newSolutions.append(generate_new_random_solution(observationList))
 
+	combinedNewSolutions = []
 	for i in xrange(int(SIXTY_PERCENT * SOLUTIONS_PER_GENERATION)):
 		newS1 = random.choice(oldSolutions)
 		newS2 = random.choice(oldSolutions)
@@ -210,8 +190,12 @@ while True:
 
 			obs_index = obs_index + 1
 
-		newSolutions.append(Solution(compute_JEZ(newObservationList), newObservationList))
+		combinedNewSolutions.append(Solution(compute_JEZ(newObservationList), newObservationList))
 
+	combinedNewSolutions = gradient_descent(combinedNewSolutions)
+	newSolutions = newSolutions + combinedNewSolutions
+
+	combinedNewSolutions = []
 	for i in xrange(int(TWENTY_PERCENT * SOLUTIONS_PER_GENERATION)):
 		newS1 = random.choice(oldSolutions)
 
@@ -235,24 +219,14 @@ while True:
 			newObservationList.append(DeviceObservation(obs.timestamp, obs.latitude + e_obsLat, 
 				obs.longitude + e_obsLong, obs.gps_granted, apList))
 
-		newSolutions.append(Solution(compute_JEZ(newObservationList), newObservationList))
-	
-	solLen = len(oldSolutions)
-	isBetter = False
-	for j in xrange(solLen):
-		if newSolutions[j].JEZ < oldSolutions[j].JEZ:
-			isBetter = True
-			break
+		combinedNewSolutions.append(Solution(compute_JEZ(newObservationList), newObservationList))
 
-	if not isBetter:
-		count = count + 1
-	else:
-		count = 0
-
-	if count == 10:
-		break
-
+	combinedNewSolutions = gradient_descent(combinedNewSolutions)
+	newSolutions = newSolutions + combinedNewSolutions
 	oldSolutions = newSolutions[:]
+	oldSolutionToCompare = newSolutionToCompare[:]
 
 for sol in newSolutions:
 	print sol.JEZ
+for obs in newSolutions[0].observationList:
+	print obs
