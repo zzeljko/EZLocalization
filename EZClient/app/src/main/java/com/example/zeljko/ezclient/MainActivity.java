@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ICommunicationChannel channel;
     private BroadcastReceiver gpsBroadcastReceiver;
     private BroadcastReceiver wifiBroadcastReceiver;
 

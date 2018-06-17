@@ -8,7 +8,7 @@ from math import sqrt, sin, atan2, log, sin, cos
 from utilities import computeJEZ
 import copy
 
-PROCS = 8
+PROCS = 4
 
 def sign(x):
     if x > 0:
@@ -20,7 +20,7 @@ def sign(x):
     else:
         return x
 
-def multiprocessing_gradient_descent(solution):
+def multiprocessingGradientDescent(solution):
 	global newSolutionList
 
 	newObservationList = []
@@ -70,18 +70,8 @@ def multiprocessing_gradient_descent(solution):
 					g = 10*xloss*((2*xapLong - 2*xobsLong)*sin(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2 + (2*xapLong - 2*xobsLong)*cos(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)*(-xPi0 + 10*xloss*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))) + 1.7)/(abs(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)) + 1.7)*abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))**2)
 					obsLong = obsLong - alpha * g
 					s = s + g * g
-				# print "==========="
-				# print Pi0
-				# print loss
-				# print apLat
-				# print apLong
-				# print obsLat
-				# print obsLong
-				# print "=========="
+
 				norm = sqrt(s)
-				# print alpha * norm
-				# print epsilon
-				# print "====="
 				if alpha * norm <= epsilon:
 					break
 
@@ -92,10 +82,6 @@ def multiprocessing_gradient_descent(solution):
 				xobsLat = obsLat
 				xobsLong = obsLong
 
-
-			# print "broken"
-			# print count
-			# count = count + 1
 			newAPFingerprintList.append(APFingerprint(AccessPoint(apFingerprint.ap.name, loss, Pi0, 
 				apLat, apLong, apFingerprint.ap.numberOfObservations), Pij))
 
@@ -103,7 +89,7 @@ def multiprocessing_gradient_descent(solution):
 	
 	newSolutionList.append(Solution(computeJEZ(copy.deepcopy(newObservationList)), copy.deepcopy(newObservationList), copy.deepcopy(newApList)))
 
-def gradient_descent(solutionList):
+def gradientDescent(solutionList):
 	
 	global alpha, epsilon
 	
@@ -112,10 +98,10 @@ def gradient_descent(solutionList):
 	manager = Manager()
 	newSolutionList = manager.list()
 
-	alpha = 0.00001
+	alpha = 0.0001
 	epsilon = 0.1
 
 	pool = Pool(processes=PROCS)
-	pool.map(multiprocessing_gradient_descent, solutionList, chunksize = len(solutionList) / PROCS)
+	pool.map(multiprocessingGradientDescent, solutionList, chunksize = len(solutionList) / PROCS)
 	pool.close()
 	return newSolutionList

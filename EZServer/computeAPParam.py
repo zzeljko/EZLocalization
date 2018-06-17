@@ -1,30 +1,20 @@
 import sqlite3
 import random
-# import math
 import numpy
-# from grad import DeviceObservation, gradient_descent, compute_JEZ
 from models import Solution, AccessPoint, APFingerprint, DeviceObservation
-from utilities import computeJEZ, getRandAPParam, getGPSSeenAPList, getRandObservationCoordinates, generateNewRandSol
-from grad import gradient_descent
+from utilities import computeJEZ, getRandAPParam, getGPSSeenAPList, getRandObservationCoordinates
+from grad import gradientDescent
 import copy
-from utilities import generateRandAVector, trilaterate
+from utilities import signature, generateRandAVector, trilaterate, generateNewRandSol
 from numpy.random import exponential
-# from trilat import trilat
-# from scipy.optimize import fsolve
-# from sympy import symbols
 
-SAME_PLACE_INTERVAL = 2000
+SAME_PLACE_INTERVAL = 1000
 
 SOLUTIONS_PER_GENERATION = 100
 
 TEN_PERCENT = 10 / 100.0
 SIXTY_PERCENT = 60 / 100.0
-TWENTY_PERCENT = 20 / 100.0
-
-def signature():
-	if random.randint(-1, 1) < 0:
-		return -1
-	return 1	
+TWENTY_PERCENT = 20 / 100.0	
 
 conn = sqlite3.connect('samples.db')
 c = conn.cursor()
@@ -113,29 +103,8 @@ oldSolutions = []
 for i in xrange(SOLUTIONS_PER_GENERATION):
 	oldSolutions.append(generateNewRandSol(copy.deepcopy(observationList), copy.deepcopy(apToKeep)))
 
-# for sol in oldSolutions:
-	# print sol.JEZ
-	# print "ap list " + str(len(sol.getApList()))
-# for obs in oldSolutions[0].getObservationList():
-# 	print obs
-# for ap in oldSolutions[0].getApList():
-# 	print ap
+oldSolutions = copy.deepcopy(gradientDescent(copy.deepcopy(oldSolutions)))
 
-# print "=========="
-
-# for ap in apToKeep:
-# 	print ap
-# print len(oldSolutions)
-# oldSolutions = copy.deepcopy(gradient_descent(copy.deepcopy(oldSolutions)))
-# print len(oldSolutions)
-
-# for sol in oldSolutions:
-	# print "ap list " + str(len(sol.getApList()))
-# 	print sol.JEZ
-# for obs in oldSolutions[0].getObservationList():
-# 	print obs
-# for ap in oldSolutions[0].getApList():
-# 	print ap
 bestOldSolutions = [oldSolutions[i] for i in xrange(0, int(TEN_PERCENT * SOLUTIONS_PER_GENERATION))]
 a = generateRandAVector(len(observationList), len(apToKeep))
 while True:
@@ -151,18 +120,15 @@ while True:
 		newSolutions.append(bestSolution)
 		oldSolutions.remove(bestSolution)
 
-	isBetter = False
-	index = 0
 	for sol in newSolutions:
 		print sol.JEZ
 	print '\n'
 	for obs in newSolutions[0].getObservationList():
 		print obs
 	print '\n'
-	for ap in newSolutions[0].getApList():
-		print ap
-	print '\n\n'
 
+	isBetter = False
+	index = 0
 	for solution in newSolutions:
 		if solution.JEZ < bestOldSolutions[index].JEZ:
 			isBetter = True
@@ -232,7 +198,7 @@ while True:
 		newSolutionApList = copy.deepcopy(combinedApList)
 		combinedSolList.append(Solution(computeJEZ(newSolutionObsList), newSolutionObsList, newSolutionApList))
 
-	# combinedSolList = copy.deepcopy(gradient_descent(copy.deepcopy(combinedSolList)))
+	combinedSolList = copy.deepcopy(gradientDescent(copy.deepcopy(combinedSolList)))
 	newSolutions = newSolutions + combinedSolList
 
 	combinedSolList = []
@@ -269,7 +235,7 @@ while True:
 		newSolutionApList = copy.deepcopy(randApList)
 		combinedSolList.append(Solution(computeJEZ(randObsList), randObsList, randApList))
 
-	# combinedSolList = copy.deepcopy(gradient_descent(copy.deepcopy(combinedSolList)))
+	combinedSolList = copy.deepcopy(gradientDescent(copy.deepcopy(combinedSolList)))
 	newSolutions = newSolutions + combinedSolList
 	bestOldSolutions = copy.deepcopy(newSolutions[0:int(TEN_PERCENT * SOLUTIONS_PER_GENERATION)])
 	oldSolutions = copy.deepcopy(newSolutions)
@@ -277,7 +243,6 @@ while True:
 for sol in newSolutions:
 	print sol.JEZ
 for obs in newSolutions[0].getObservationList():
-	# obs.latitude, obs.longitude = trilaterate(obs.apFingerprintList)
 	print obs
 for ap in newSolutions[0].getApList():
 	print ap
