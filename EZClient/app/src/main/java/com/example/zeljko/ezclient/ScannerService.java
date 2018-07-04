@@ -30,8 +30,6 @@ public class ScannerService extends Service implements IOnWifiDataCallback {
     private static final int GPS_SAMPLES_PER_SCAN = 10;
 
     private int numberOfGpsSamples;
-    private double gpsLatitudeSum;
-    private double gpsLongitudeSum;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -46,8 +44,6 @@ public class ScannerService extends Service implements IOnWifiDataCallback {
     @Override
     public void onCreate() {
         numberOfGpsSamples = 0;
-        gpsLatitudeSum = 0.0;
-        gpsLongitudeSum = 0.0;
         firstTime = true;
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         createLocationListener();
@@ -68,21 +64,17 @@ public class ScannerService extends Service implements IOnWifiDataCallback {
         criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
 
         locationManager.requestLocationUpdates(MIN_TIME_BETWEEN_SCANS, MIN_DISTANCE_BETWEEN_SCANS, criteria, locationListener, null);
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BETWEEN_SCANS,
-//                MIN_DISTANCE_BETWEEN_SCANS, locationListener);
 
         wifiScanner = new WifiScanner(getApplicationContext(), this);
     }
 
-    Location lastMeanLocation;
-    Location lastLocation;
     boolean firstTime;
 
     private void createLocationListener() {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if (location.getAccuracy() > ACCURACY_LIMIT || location.getSpeed() > 0.1) {
+                if (location.getAccuracy() > ACCURACY_LIMIT) {
                     firstTime = true;
                     return;
                 }
@@ -92,31 +84,19 @@ public class ScannerService extends Service implements IOnWifiDataCallback {
                     Toast.makeText(getApplicationContext(), "new location", Toast.LENGTH_SHORT).show();
                     firstTime = false;
                     numberOfGpsSamples = 0;
-                    gpsLatitudeSum = 0.0;
-                    gpsLongitudeSum = 0.0;
                 }
 
-//                if (lastMeanLocation != null)
-//                    Toast.makeText(getApplicationContext(), "" + lastLocation.distanceTo(location), Toast.LENGTH_SHORT).show();
-
-                gpsLatitudeSum += location.getLatitude();
-                gpsLongitudeSum += location.getLongitude();
                 numberOfGpsSamples++;
                 Toast.makeText(getApplicationContext(), "" + numberOfGpsSamples, Toast.LENGTH_SHORT).show();
                 if (numberOfGpsSamples == GPS_SAMPLES_PER_SCAN) {
                     Toast.makeText(getApplicationContext(), "move", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent("location_update");
-                    lastMeanLocation = new Location("location_provider");
-                    lastMeanLocation.setLatitude(gpsLatitudeSum / numberOfGpsSamples);
-                    lastMeanLocation.setLongitude(gpsLongitudeSum / numberOfGpsSamples);
-
-                    intent.putExtra("location", new GPSFingerprint(lastMeanLocation).toString());
+                    intent.putExtra("location", new GPSFingerprint(location).toString());
 
                     sendBroadcast(intent);
-                    lastLocation = lastMeanLocation;
+                    numberOfGpsSamples = 0;
                     return;
                 }
-                lastLocation = location;
             }
 
             @Override

@@ -8,7 +8,7 @@ import copy
 from utilities import signature, generateRandAVector, trilaterate, generateNewRandSol
 from numpy.random import exponential
 
-SAME_PLACE_INTERVAL = 1000
+SAME_PLACE_INTERVAL = 2000
 
 SOLUTIONS_PER_GENERATION = 100
 
@@ -19,11 +19,11 @@ TWENTY_PERCENT = 20 / 100.0
 conn = sqlite3.connect('samples.db')
 c = conn.cursor()
 
-c.execute("SELECT * from wifi_samples")
+c.execute("SELECT * from wifi_samples_home")
 
 rows = c.fetchall()
 
-c.execute("SELECT * from gps_samples")
+c.execute("SELECT * from gps_samples_home")
 gps_rows = c.fetchall()
 
 observationList = []
@@ -100,32 +100,47 @@ for obs in observationList:
 	obs.apFingerprintList = copy.deepcopy(fingerprintToKeepList)
 
 oldSolutions = []
+
 for i in xrange(SOLUTIONS_PER_GENERATION):
 	oldSolutions.append(generateNewRandSol(copy.deepcopy(observationList), copy.deepcopy(apToKeep)))
 
+for sol in oldSolutions:
+	print sol
+
+for obs in oldSolutions[0].getObservationList():
+	if not obs.gpsGranted:
+		print obs
+
 oldSolutions = copy.deepcopy(gradientDescent(copy.deepcopy(oldSolutions)))
 
-bestOldSolutions = [oldSolutions[i] for i in xrange(0, int(TEN_PERCENT * SOLUTIONS_PER_GENERATION))]
+for sol in oldSolutions:
+	print sol.JEZ
+
+for obs in oldSolutions[0].getObservationList():
+	if not obs.gpsGranted:
+		print obs
+
+bestOldSolutions = copy.deepcopy([oldSolutions[i] for i in xrange(0, int(TEN_PERCENT * SOLUTIONS_PER_GENERATION))])
 a = generateRandAVector(len(observationList), len(apToKeep))
 while True:
 
 	newSolutions = []
-
 	for i in xrange(0, int(TEN_PERCENT * SOLUTIONS_PER_GENERATION)):
 		best = 1000
 		for oldSolution in oldSolutions:
 			if oldSolution.JEZ < best:
 				bestSolution = oldSolution
 				best = oldSolution.JEZ
-		newSolutions.append(bestSolution)
+		newSolutions.append(copy.deepcopy(bestSolution))
 		oldSolutions.remove(bestSolution)
 
 	for sol in newSolutions:
-		print sol.JEZ
+		print sol
 	print '\n'
-	for obs in newSolutions[0].getObservationList():
-		print obs
-	print '\n'
+	# for obs in newSolutions[0].getObservationList():
+	# 	if not obs.gpsGranted:
+	# 		print obs
+	# print '\n'
 
 	isBetter = False
 	index = 0
@@ -152,8 +167,8 @@ while True:
 		S1 = copy.deepcopy(random.choice(oldSolutions))
 		S2 = copy.deepcopy(random.choice(oldSolutions))
 
-		S1ApList = S1.getApList()
-		S2ApList = S2.getApList()
+		S1ApList = copy.deepcopy(S1.getApList())
+		S2ApList = copy.deepcopy(S2.getApList())
 
 		newApList = []
 		apIndex = 0
@@ -244,5 +259,12 @@ for sol in newSolutions:
 	print sol.JEZ
 for obs in newSolutions[0].getObservationList():
 	print obs
+
+conn = sqlite3.connect('samples.db')
+c = conn.cursor()
+c.execute("CREATE TABLE IF NOT EXISTS ap_loc_home (bssId varchar(25), Pi0 double precision, path_loss double precision, latitude double precision, longitude double precision)")
+
 for ap in newSolutions[0].getApList():
-	print ap
+	c.execute("insert into ap_loc_home values (?, ?, ?, ?, ?)", [ap.name, ap.Pi0, ap.loss, ap.latitude, ap.longitude])
+	conn.commit()
+

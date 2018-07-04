@@ -46,28 +46,28 @@ def multiprocessingGradientDescent(solution):
 			xapLat = apLat = apFingerprint.ap.latitude
 			xapLong = apLong = apFingerprint.ap.longitude
 			while True:
-				g = (xPi0 - 10*xloss*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))) - 1.7)/abs(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)) + 1.7)
+				g = (xPi0 - 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) - Pij)*sqrt((-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)**2)/(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)**2
 				Pi0 = Pi0 - alpha * g
 				s = g * g
 
-				g = (100*xloss*phase(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))**2 + 10*(-xPi0 + 10*xloss*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))) + 1.7)*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))))/abs(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)) + 1.7)
+				g = 10*sqrt((-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)**2)*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/((-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)*log(10))
 				loss = loss - alpha * g
 				s = s + g * g
 
-				g = 10*xloss*((-2*xapLat + 2*xobsLat)*sin(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2 + (-2*xapLat + 2*xobsLat)*cos(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)*(-xPi0 + 10*xloss*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))) + 1.7)/(abs(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)) + 1.7)*abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))**2)
+				g = 10*xloss*(-xapLat + xobsLat)*sqrt((-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)**2)/(((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)*(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)*log(10))
 				apLat = apLat - alpha * g
 				s = s + g * g
 
-				g = 10*xloss*((-2*xapLong + 2*xobsLong)*sin(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2 + (-2*xapLong + 2*xobsLong)*cos(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)*(-xPi0 + 10*xloss*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))) + 1.7)/(abs(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)) + 1.7)*abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))**2)
+				g = 10*xloss*(-xapLong + xobsLong)*sqrt((-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)**2)/(((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)*(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)*log(10))
 				apLong = apLong - alpha * g
 				s = s + g * g
 
 				if not observation.gpsGranted:
-					g = 10*xloss*((2*xapLat - 2*xobsLat)*sin(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2 + (2*xapLat - 2*xobsLat)*cos(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)*(-xPi0 + 10*xloss*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))) + 1.7)/(abs(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)) + 1.7)*abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))**2)
+					g = 10*xloss*(xapLat - xobsLat)*sqrt((-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)**2)/(((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)*(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)*log(10))
 					obsLat = obsLat - alpha * g
 					s = s + g * g
 
-					g = 10*xloss*((2*xapLong - 2*xobsLong)*sin(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2 + (2*xapLong - 2*xobsLong)*cos(atan2(0, xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)**2*sign(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2)/2)*(-xPi0 + 10*xloss*log(abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))) + 1.7)/(abs(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)) + 1.7)*abs(sqrt(xapLat**2 - 2*xapLat*xobsLat + xapLong**2 - 2*xapLong*xobsLong + xobsLat**2 + xobsLong**2))**2)
+					g = 10*xloss*(xapLong - xobsLong)*sqrt((-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)**2)/(((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2)*(-xPi0 + 10*xloss*log(sqrt((-xapLat + xobsLat)**2 + (-xapLong + xobsLong)**2))/log(10) + Pij)*log(10))
 					obsLong = obsLong - alpha * g
 					s = s + g * g
 
@@ -81,6 +81,12 @@ def multiprocessingGradientDescent(solution):
 				xapLong = apLong
 				xobsLat = obsLat
 				xobsLong = obsLong
+
+			# apFingerprint.ap.Pi0 = Pi0
+			# apFingerprint.ap.loss = loss
+			# apFingerprint.ap.latitude = apLat
+			# apFingerprint.ap.longitude = apLong
+			
 
 			newAPFingerprintList.append(APFingerprint(AccessPoint(apFingerprint.ap.name, loss, Pi0, 
 				apLat, apLong, apFingerprint.ap.numberOfObservations), Pij))
@@ -98,7 +104,7 @@ def gradientDescent(solutionList):
 	manager = Manager()
 	newSolutionList = manager.list()
 
-	alpha = 0.0001
+	alpha = 0.000000001
 	epsilon = 0.1
 
 	pool = Pool(processes=PROCS)

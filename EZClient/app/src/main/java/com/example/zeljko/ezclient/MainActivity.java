@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,13 +13,51 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, IOnEZUpdate{
 
     private BroadcastReceiver gpsBroadcastReceiver;
     private BroadcastReceiver wifiBroadcastReceiver;
 
     private Button startButton;
     private Button stopButton;
+
+    private float newLat;
+    private float newLong;
+
+    private IOnEZUpdate callbackContext;
+    GoogleMap googleMap;
+    MarkerOptions currentPos;
+    CircleOptions circlePos;
+    Circle circle;
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+//        marker = googleMap.addMarker(currentPos);
+        circle = googleMap.addCircle(circlePos);
+    }
+
+    @Override
+    public void onEZUpdateCallback(String latitude, String longitude) {
+        newLat = Float.parseFloat(latitude);
+        newLong = Float.parseFloat(longitude);
+
+        LatLng pos = new LatLng(newLat, newLong);
+//        marker.setPosition(pos);
+        circle.setCenter(pos);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 20));
+    }
 
     private class StartButtonClickListener implements Button.OnClickListener {
 
@@ -35,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
                         String message = intent.getExtras().get("location").toString();
 //                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                        new MessageSender().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message, getString(R.string.gps_message_to_server));
+                        new MessageSender(callbackContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message, getString(R.string.gps_message_to_server));
                     }
                 };
 
@@ -46,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
                         String message = intent.getExtras().get("wifi_record_list").toString();
 //                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                        new MessageSender().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message, getString(R.string.wifi_message_to_server));
+                        new MessageSender(callbackContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, message, getString(R.string.wifi_message_to_server));
 
                     }
                 };
@@ -75,6 +114,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        callbackContext = this;
+        currentPos = new MarkerOptions().position(new LatLng(0, 0))
+                .title("Marker in PRECIS");
+        circlePos = new CircleOptions().center(new LatLng(0, 0)).radius(0.2).fillColor(Color.BLUE);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.google_map);
+        mapFragment.getMapAsync(this);
 
         startButton = findViewById(R.id.startButton);
         stopButton = findViewById(R.id.stopButton);

@@ -1,8 +1,10 @@
 package com.example.zeljko.ezclient;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.renderscript.ScriptGroup;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,6 +20,13 @@ public class MessageSender extends AsyncTask<String,Void,String> {
 
     private static final String host = "192.168.100.15";
     private static boolean transmissionFinished = true;
+    private IOnEZUpdate ezCallback;
+    private String latitude;
+    private String longitude;
+
+    public MessageSender(IOnEZUpdate ezCallback) {
+        this.ezCallback = ezCallback;
+    }
 
     @Override
     protected String doInBackground(String... params) {
@@ -40,10 +49,57 @@ public class MessageSender extends AsyncTask<String,Void,String> {
             Log.d("messageType", messageType);
             bufferedWriter.write(messageType);
             bufferedWriter.flush();
-            bufferedReader.read();
+            String msg = "";
+            while (true) {
+                int ch = bufferedReader.read();
+                msg += (char)ch;
+                if (ch == '\n')
+                    break;
+            }
+            Log.d("msg", msg);
             bufferedWriter.write(message);
             bufferedWriter.flush();
 
+            msg = "";
+            while (true) {
+                int ch = bufferedReader.read();
+                msg += (char)ch;
+                if (ch == '\n')
+                    break;
+            }
+            Log.d("lat", msg + "");
+
+            String latitude = "";
+            while (true) {
+                int ch = bufferedReader.read();
+                latitude += (char)ch;
+                if (ch == '\n')
+                    break;
+            }
+            Log.d("lat", latitude + "");
+            bufferedWriter.write("ACK");
+            bufferedWriter.flush();
+
+            String longitude = "";
+            while (true) {
+                int ch = bufferedReader.read();
+                longitude += (char)ch;
+                if (ch == '\n')
+                    break;
+            }
+            Log.d("long", longitude + "");
+            this.latitude = latitude;
+            this.longitude = longitude;
+            bufferedWriter.write("ACK");
+            bufferedWriter.flush();
+//            float latitude = Float.parseFloat(bufferedReader.readLine());
+//            bufferedWriter.write("ACK");
+//            bufferedWriter.flush();
+
+//            float longitude = Float.parseFloat(bufferedReader.readLine());
+//            bufferedWriter.write("ACK");
+//            bufferedWriter.flush();
+//            Log.d("lat", latitude + "");
             inputStream.close();
             dos.close();
             mySocket.close();
@@ -57,5 +113,6 @@ public class MessageSender extends AsyncTask<String,Void,String> {
     @Override
     protected void onPostExecute(String s) {
         transmissionFinished = true;
+        ezCallback.onEZUpdateCallback(latitude, longitude);
     }
 }

@@ -15,10 +15,14 @@ MIN_PI0 = -50
 MAX_PI0 = -1
 
 MIN_LATITTUDE = 44.426878
+# MIN_LATITTUDE = 44.434161
 MAX_LATITUDE = 44.428410
+# MAX_LATITUDE = 44.436100
 
 MIN_LONGITUDE = 26.048199
+# MIN_LONGITUDE = 26.045321
 MAX_LONGITUDE = 26.051075
+# MAX_LONGITUDE = 26.050272
 
 LAT_DEG_TO_METERS = 111200
 LONG_DEG_TO_METERS = 79990
@@ -227,20 +231,31 @@ def ERSGA(LDone, CDone, O, l, base, observationList, apList):
 
 def generateNewRandSol(observationList, apList):
 
-	LDone = []
-	for obs in observationList:
-		if obs.gpsGranted:
-			LDone.append(obs)
-	CDone = []
-	O = []
-	if len(LDone) >= 5:
-		base = 5
-	else:
-		base = len(LDone)
+	# LDone = []
+	# for obs in observationList:
+	# 	if obs.gpsGranted:
+	# 		LDone.append(obs)
+	# CDone = []
+	# O = []
+	# if len(LDone) >= 5:
+	# 	base = 5
+	# else:
+	# 	base = len(LDone)
 
-	l = base
-	ERSGA(LDone, CDone, O, l, base, observationList, apList)
-	return Solution(computeJEZ(observationList), copy.deepcopy(observationList), copy.deepcopy(apList))
+	# l = base
+	# ERSGA(LDone, CDone, O, l, base, observationList, apList)
+	for ap in apList:
+		ap.loss, ap.pi0, ap.latitude, ap.longitude = getRandAPParam()
+
+	for obs in observationList:
+		obs.latitude, obs.longitude = getRandObservationCoordinates()
+		for apFingerprint in obs.apFingerprintList:
+			for ap in apList:
+				if apFingerprint.ap.name == ap.name:
+					apFingerprint.ap = ap
+					break
+
+	return Solution(computeJEZ(copy.deepcopy(observationList)), copy.deepcopy(observationList), copy.deepcopy(apList))
 
 def solveTrilat(obsCoord, d):
 	unknown = obsCoord

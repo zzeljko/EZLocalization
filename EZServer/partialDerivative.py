@@ -3,7 +3,7 @@ from sympy import symbols, diff, log, sqrt
 xPi0, xloss, xobsLat, xobsLong, xapLat, xapLong = symbols('xPi0 xloss xobsLat xobsLong xapLat xapLong', real=True)
 	
 Pij = 1.7
-f = abs(Pij - xPi0 + 10 * xloss * log(sqrt((xobsLat - xapLat)**2 + (xobsLong - xapLong) ** 2)))
+f = sqrt((Pij - xPi0 + 10 * xloss * log(sqrt((xobsLat - xapLat)**2 + (xobsLong - xapLong) ** 2), 10)) ** 2)
 
 d1 = diff(f, xPi0)
 d2 = diff(f, xloss)
