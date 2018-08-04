@@ -20,20 +20,25 @@ MAX_PATH_LOSS = 6.0
 MIN_PI0 = -50
 MAX_PI0 = -1
 
-INDOOR_LAT_MIN = 44.427560
-INDOOR_LAT_MAX = 44.427650
-INDOOR_LONG_MIN = 26.049637
-INDOOR_LONG_MAX = 26.049747
+# INDOOR_LAT_MIN = 44.427560
+# INDOOR_LAT_MAX = 44.427650
+# INDOOR_LONG_MIN = 26.049637
+# INDOOR_LONG_MAX = 26.049747
 
-MIN_LATITTUDE = 44.426878
-# MIN_LATITTUDE = 44.434161
-MAX_LATITUDE = 44.428410
-# MAX_LATITUDE = 44.436100
+INDOOR_LAT_MIN = 44.434731
+INDOOR_LAT_MAX = 44.435256
+INDOOR_LONG_MIN = 26.047094
+INDOOR_LONG_MAX = 26.047993
 
-MIN_LONGITUDE = 26.048199
-# MIN_LONGITUDE = 26.045321
-MAX_LONGITUDE = 26.051075
-# MAX_LONGITUDE = 26.050272
+# MIN_LATITTUDE = 44.426878
+MIN_LATITTUDE = 44.434161
+# MAX_LATITUDE = 44.428410
+MAX_LATITUDE = 44.436100
+
+# MIN_LONGITUDE = 26.048199
+MIN_LONGITUDE = 26.045321
+# MAX_LONGITUDE = 26.051075
+MAX_LONGITUDE = 26.050272
 
 LAT_DEG_TO_METERS = 111200
 LONG_DEG_TO_METERS = 79990
@@ -42,8 +47,8 @@ def create_table():
 	
 	conn = sqlite3.connect('samples.db')
 	c = conn.cursor()
-	c.execute("CREATE TABLE IF NOT EXISTS wifi_samples_home (bssId varchar(25), signalStrength integer, timestamp bigint)")
-	c.execute("CREATE TABLE IF NOT EXISTS gps_samples_home (client varchar(25), latitude double precision, longitude double precision, timestamp bigint)")
+	c.execute("CREATE TABLE IF NOT EXISTS wifi_samples_precis (bssId varchar(25), signalStrength integer, timestamp bigint)")
+	c.execute("CREATE TABLE IF NOT EXISTS gps_samples_precis (client varchar(25), latitude double precision, longitude double precision, timestamp bigint)")
 	return conn
 
 def add_to_db(scanType, scan, conn):
@@ -51,10 +56,10 @@ def add_to_db(scanType, scan, conn):
 
 	if scanType == wifiFingerprint:
 		for ap in scan.wifiAPList:
-			c.execute("insert into wifi_samples_home values (?, ?, ?)", [ap.bssId, ap.signal, scan.timestamp])
+			c.execute("insert into wifi_samples_precis values (?, ?, ?)", [ap.bssId, ap.signal, scan.timestamp])
 			conn.commit()
 	else:
-		c.execute("insert into gps_samples_home values (?, ?, ?, ?)", [scan.client, scan.latitude, scan.longitude, scan.timestamp])
+		c.execute("insert into gps_samples_precis values (?, ?, ?, ?)", [scan.client, scan.latitude, scan.longitude, scan.timestamp])
 		conn.commit()
 
 def computeLocation(fptype, scan):
@@ -68,7 +73,7 @@ def computeLocation(fptype, scan):
 	eq = []
 	
 	for ap in scan.wifiAPList:
-		knownAP = c.execute("SELECT * FROM ap_loc_home WHERE bssId = ?", (ap.bssId,)).fetchall()
+		knownAP = c.execute("SELECT * FROM ap_loc_precis WHERE bssId = ?", (ap.bssId,)).fetchall()
 		if knownAP == None or knownAP == []:
 			continue
 
@@ -134,14 +139,13 @@ while 1:
 	print fingerprintType
 	conn.send(ACK)
 	jsonWifiScan = ""
-	jsonWifiScan = conn.recv(4096)
-	# while True:
-		# print jsonWifiScanPart
-		# if len(jsonWifiScanPart) == 0:
-			# break
-
-		# jsonWifiScan = jsonWifiScan + jsonWifiScanPart
-		# jsonWifiScanPart = conn.recv(4096)
+	while True:
+		jsonWifiScanPart = conn.recv(4096)
+		if 'z' in jsonWifiScanPart:
+			jsonWifiScan = jsonWifiScan + jsonWifiScanPart[:-1]
+			break
+		jsonWifiScan = jsonWifiScan + jsonWifiScanPart
+	
 	conn.send(ACK)
 	jsonDecoder = json.loads(jsonWifiScan)
 	if fingerprintType == wifiFingerprint:

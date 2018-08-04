@@ -1,7 +1,13 @@
-aaox = [0.4, 0.3, 0.2, 0.1]
-aaoy = [28,21,17,14]
+aaox = [1, 0.6, 0.2, 0]
+aaoy = [30,20,12,6]
 plot(aaoy,aaox);
-title("THREE-ROOMS FLAT ACCURACY");
+hold;
+
+aaox = [1, 0.6, 0.2, 0]
+aaoy = [25,16,11,6]
+plot(aaoy,aaox);
+
+title("PRECIS ACCURACY");
 xlabel("ERROR(m)",'fontweight','bold');
 ylabel("PERCENTILE",'fontweight','bold');
 

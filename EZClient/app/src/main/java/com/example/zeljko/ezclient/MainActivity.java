@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng pos = new LatLng(newLat, newLong);
 //        marker.setPosition(pos);
         circle.setCenter(pos);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 20));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 18));
     }
 
     private class StartButtonClickListener implements Button.OnClickListener {

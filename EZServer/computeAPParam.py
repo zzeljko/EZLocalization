@@ -19,11 +19,11 @@ TWENTY_PERCENT = 20 / 100.0
 conn = sqlite3.connect('samples.db')
 c = conn.cursor()
 
-c.execute("SELECT * from wifi_samples_home")
+c.execute("SELECT * from wifi_samples_precis")
 
 rows = c.fetchall()
 
-c.execute("SELECT * from gps_samples_home")
+c.execute("SELECT * from gps_samples_precis")
 gps_rows = c.fetchall()
 
 observationList = []
@@ -262,9 +262,9 @@ for obs in newSolutions[0].getObservationList():
 
 conn = sqlite3.connect('samples.db')
 c = conn.cursor()
-c.execute("CREATE TABLE IF NOT EXISTS ap_loc_home (bssId varchar(25), Pi0 double precision, path_loss double precision, latitude double precision, longitude double precision)")
+c.execute("CREATE TABLE IF NOT EXISTS ap_loc_precis (bssId varchar(25), Pi0 double precision, path_loss double precision, latitude double precision, longitude double precision)")
 
 for ap in newSolutions[0].getApList():
-	c.execute("insert into ap_loc_home values (?, ?, ?, ?, ?)", [ap.name, ap.Pi0, ap.loss, ap.latitude, ap.longitude])
+	c.execute("insert into ap_loc_precis values (?, ?, ?, ?, ?)", [ap.name, ap.Pi0, ap.loss, ap.latitude, ap.longitude])
 	conn.commit()
 

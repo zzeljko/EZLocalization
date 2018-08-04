@@ -18,7 +18,7 @@ import java.net.Socket;
 
 public class MessageSender extends AsyncTask<String,Void,String> {
 
-    private static final String host = "192.168.100.15";
+    private static final String host = "172.19.10.35";
     private static boolean transmissionFinished = true;
     private IOnEZUpdate ezCallback;
     private String latitude;
@@ -57,7 +57,7 @@ public class MessageSender extends AsyncTask<String,Void,String> {
                     break;
             }
             Log.d("msg", msg);
-            bufferedWriter.write(message);
+            bufferedWriter.write(message + "z");
             bufferedWriter.flush();
 
             msg = "";
